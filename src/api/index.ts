@@ -111,7 +111,7 @@ class YtApi {
     if (!playlist) {
       return false;
     }
-    return { playlist, context: res.context, apiToken: res.apiToken || "" };
+    return { playlist, context: res.context, apiToken: res.apiToken || '' };
   }
 
   async getAutoCompleteSearch(query: string): Promise<string[] | false> {
@@ -137,7 +137,7 @@ class YtApi {
     if (!search) {
       return false;
     }
-    return { search, context: res.context, apiToken: res.apiToken || "" };
+    return { search, context: res.context, apiToken: res.apiToken || '' };
   }
 
   //  ===== Next pages =====

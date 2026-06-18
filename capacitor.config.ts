@@ -29,16 +29,16 @@ if (process.env.NODE_ENV === 'development') {
 
 // Inject Android signing config (useful for Release builds)
 if (process.env.KEYSTORE_PASSWORD) {
-    config.android = {
-      buildOptions: {
-        keystorePath: path.resolve(__dirname, "android/keystores/release-key.jks"),
-        keystorePassword: process.env.KEYSTORE_PASSWORD,
-        keystoreAlias: process.env.KEYSTORE_ALIAS,
-        keystoreAliasPassword: process.env.KEYSTORE_ALIAS_PASSWORD,
-        releaseType: "APK",
-        signingType: "apksigner",
-      }
-    };
+  config.android = {
+    buildOptions: {
+      keystorePath: path.resolve(__dirname, 'android/keystores/release-key.jks'),
+      keystorePassword: process.env.KEYSTORE_PASSWORD,
+      keystoreAlias: process.env.KEYSTORE_ALIAS,
+      keystoreAliasPassword: process.env.KEYSTORE_ALIAS_PASSWORD,
+      releaseType: 'APK',
+      signingType: 'apksigner',
+    },
+  };
 }
 
 export default config;

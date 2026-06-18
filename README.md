@@ -41,11 +41,9 @@ Seamlessly play YouTube videos and playlists as music tracks, ready to play in t
 - Browse trending and latest music library or songs.
 - Paste a YouTube playlist, and we'll convert it into music that you can listen right away.
 
-
 ### 🎧 Background Playback
 
 - Enjoy uninterrupted background music while working, studying, or relaxing.
-
 
 ### 🎨 Material 3 Design
 
@@ -57,7 +55,6 @@ Seamlessly play YouTube videos and playlists as music tracks, ready to play in t
 - Explore latest trending music, popular around you based on your region.
 - Switch region in one click
 
-
 ### ▶ Multi Mode
 
 - Switch between Audio or Video mode.
@@ -68,10 +65,9 @@ Seamlessly play YouTube videos and playlists as music tracks, ready to play in t
 
 Dowload to your device.
 
-|  Download |
-| --------- |
-| [![Download arm64-v8a](screenshots/get-it-on-github.png)](https://github.com/saavn-labs/app/releases/download/v1.0.4/app-arm64-v8a-release.apk) |
-
+| Download                                                                                           |
+| -------------------------------------------------------------------------------------------------- |
+| [![Download arm64-v8a](screenshots/get-it-on-github.png)](https://github.com/beecoder-hub/yomusic) |
 
 ---
 
@@ -140,13 +136,12 @@ Yo Music follows a **Material Design inspired interface** using Konsta UI.
 
 Before you begin, ensure you have the following installed:
 
-| Requirement                 | Version          | Download                                                          |
-| --------------------------- | ---------------- | ----------------------------------------------------------------- |
-| **Node.js**                 | 22.x or higher   | [nodejs.org](https://nodejs.org/)                                 |
-| **Java JDK**                | 21 (recommended) | [Open JDK](https://jdk.java.net/archive/) |
-| **Android SDK**             | Latest           | Via Android Studio                                                |
-| **Android Device/Emulator** | API 24+          | [Android Studio](https://developer.android.com/studio)            |
-
+| Requirement                 | Version          | Download                                               |
+| --------------------------- | ---------------- | ------------------------------------------------------ |
+| **Node.js**                 | 22.x or higher   | [nodejs.org](https://nodejs.org/)                      |
+| **Java JDK**                | 21 (recommended) | [Open JDK](https://jdk.java.net/archive/)              |
+| **Android SDK**             | Latest           | Via Android Studio                                     |
+| **Android Device/Emulator** | API 24+          | [Android Studio](https://developer.android.com/studio) |
 
 **Clone the repository:**
 
@@ -193,7 +188,6 @@ Feel free to fork the project and create a pull request.
 - All media data and URLs are fetched from publicly accessible APIs
 
 This project is intended for **educational and personal use only**.
-
 
 ## 📜 License
 

@@ -22,7 +22,7 @@ const YtWrapper = () => {
     anchorRef,
     videoId: currentPlayingVideo.videoId ?? 'M7lc1UVf-VE',
     isPlaying: isPlaying,
-    isLoop:isLoop,
+    isLoop: isLoop,
     onReady: () => {
       setIsPlayerReady(true);
     },
@@ -69,7 +69,11 @@ const YtWrapper = () => {
             <MdClose className="w-5 h-5" />
           </button>
         </div>
-        <div id="player" ref={anchorRef} className="w-full xl:w-100 h-80 rounded-xl overflow-hidden"></div>
+        <div
+          id="player"
+          ref={anchorRef}
+          className="w-full xl:w-100 h-80 rounded-xl overflow-hidden"
+        ></div>
       </div>
     </div>
   );
