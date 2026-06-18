@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+/* import Konsta UI theme */
+@import 'konsta/react/theme.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-primary: #009966;
+}
+
+:root {
+  --env-safe-area-top: 16px;
+  --env-safe-area-bottom: 0px;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  #root {
+    height: 100%;
+  }
+}

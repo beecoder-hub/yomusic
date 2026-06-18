@@ -1,0 +1,2 @@
+patchedDependencies:
+  '@capacitor/android': patches/@capacitor__android.patch

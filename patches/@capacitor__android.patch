@@ -1,0 +1,44 @@
+diff --git a/capacitor/src/main/java/com/getcapacitor/CapacitorWebView.java b/capacitor/src/main/java/com/getcapacitor/CapacitorWebView.java
+index 22f6f9729bb43e7df7e911527bc7f8bc201ad60d..049abb22a514a4e971037b47ccd9fe6ef4bc68fa 100644
+--- a/capacitor/src/main/java/com/getcapacitor/CapacitorWebView.java
++++ b/capacitor/src/main/java/com/getcapacitor/CapacitorWebView.java
+@@ -12,6 +12,8 @@ import android.webkit.WebView;
+ import androidx.core.graphics.Insets;
+ import androidx.core.view.ViewCompat;
+ import androidx.core.view.WindowInsetsCompat;
++// #custom import:
++import android.view.*;
+ 
+ public class CapacitorWebView extends WebView {
+ 
+@@ -26,6 +28,30 @@ public class CapacitorWebView extends WebView {
+         this.bridge = bridge;
+     }
+ 
++    @Override
++    protected void onWindowVisibilityChanged(int visibility) {
++        // Force the parent class to always receive the VISIBLE state
++        super.onWindowVisibilityChanged(View.VISIBLE);
++    }
++
++    @Override
++    protected void onVisibilityChanged(View changedView, int visibility) {
++        // Force overall visibility changes to remain VISIBLE
++        super.onVisibilityChanged(changedView, View.VISIBLE);
++    }
++
++    @Override
++    public int getWindowVisibility() {
++        // Intercept getter queries and return VISIBLE
++        return View.VISIBLE;
++    }
++
++    @Override
++    public int getVisibility() {
++        // Intercept getter queries and return VISIBLE
++        return View.VISIBLE;
++    }
++
+     @Override
+     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+         CapConfig config;

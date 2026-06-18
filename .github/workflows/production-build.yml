@@ -1,0 +1,103 @@
+name: Android Production Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'App Version (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0' # Allows you to also trigger it manually
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="v${{ github.event.inputs.version }}"
+          
+          # Check if the tag exists on GitHub remote
+          if git ls-remote --tags origin | grep -q "refs/tags/$TAG_NAME"; then
+            echo "::error::The version $TAG_NAME already exists! Please use a unique version number."
+            exit 1
+          fi
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Decode Keystore
+        run: |
+          mkdir -p android/keystores
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/keystores/release-key.jks
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      # Build web assets and Sync web assets into the android folder
+      - name: Capacitor Sync
+        run: pnpm run build:android
+
+      - name: Android SDK Build Tools Path
+        run: |
+          # Finds the latest installed version of build-tools (e.g., 34.0.0, 35.0.0)
+          LATEST_BUILD_TOOLS=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          echo "$LATEST_BUILD_TOOLS" >> $GITHUB_PATH
+
+      - name: Build and Sign Release APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
+        run: |
+          chmod +x ./android/gradlew
+          npx cap build android
+
+      - name: Create Git Tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          TAG="v${{ github.event.inputs.version }}"
+
+          git tag $TAG
+          git push origin $TAG
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          files: android/app/build/outputs/apk/release/app-release-signed.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

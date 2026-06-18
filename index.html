@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Yo Music</title>
+    <script>
+      const stored = localStorage.getItem('theme');
+      if (stored) {
+        document.documentElement.classList.add(stored);
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    </script>
+  </head>
+  <body class="select-none h-screen bg-md-light-surface-2 dark:bg-md-dark-surface-2 pb-0!">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
