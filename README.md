@@ -67,7 +67,7 @@ Dowload to your device.
 
 | Download                                                                                           |
 | -------------------------------------------------------------------------------------------------- |
-| [![Download arm64-v8a](screenshots/get-it-on-github.png)](https://github.com/beecoder-hub/yomusic) |
+| [![Download arm64-v8a](screenshots/get-it-on-github.png)](https://github.com/beecoder-hub/yomusic/releases) |
 
 ---
 
