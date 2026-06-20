@@ -1,120 +1,100 @@
 import { useEffect } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
-// Unique IDs for both daily slots
+const CHANNEL_ID = 'music_alerts';
 const NOTIFICATION_ID_AM = 1;
 const NOTIFICATION_ID_PM = 2;
-const CHANNEL_ID = 'music_alerts';
 
-const messages = [
+const morningMessages = [
   "Don't forget to listen to the latest releases!",
-  'Start listening to your favorite songs!',
-  'Take a look at new releases!',
-  'Enjoy the latest trending music now!',
+  'Fresh music is waiting for you!',
 ];
 
-function getRandomMessage() {
-  return messages[Math.floor(Math.random() * messages.length)];
+const eveningMessages = ['Relax with some trending music!', 'Catch up on the latest releases!'];
+
+function getRandomMessage(list: string[]) {
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 async function setupDailyNotifications() {
-  const today = new Date().toDateString();
-
-  // Parse localized persistence safely
-  const savedNotifData = localStorage.getItem('notif_last_set_v2');
-  let notifStatus = { am: '', pm: '' };
-
-  if (savedNotifData) {
-    try {
-      notifStatus = JSON.parse(savedNotifData);
-    } catch (e) {
-      console.error('Failed to parse notification storage:', e);
-    }
-  }
-
-  // Check if BOTH are already scheduled for today
-  if (notifStatus.am === today && notifStatus.pm === today) {
-    console.log('All notifications are already up to date.');
-    return;
-  }
-
   try {
-    // 1. Core Request Permissions
     const permission = await LocalNotifications.requestPermissions();
+
     if (permission.display !== 'granted') {
-      console.log('Notification permission not granted');
       return;
     }
 
-    // 2. Android Channel Configuration
     await LocalNotifications.createChannel({
       id: CHANNEL_ID,
       name: 'Music Alerts',
-      description: 'Daily reminders for music updates',
-      importance: 5, // High importance forces banner/sound
-      visibility: 1, // Visible everywhere (Lockscreen included)
+      importance: 5,
+      visibility: 1,
     });
 
-    // 3. Inspect Current OS Queue
+    const saved = localStorage.getItem('daily_notifs_set');
+
+    // Check existing scheduled notifications
     const pending = await LocalNotifications.getPending();
-    const activeIds = pending.notifications.map((n) => n.id);
 
-    const notificationsToSchedule = [];
+    const ids = pending.notifications.map((n) => n.id);
 
-    // --- 8:00 AM Notification Handling ---
-    if (notifStatus.am !== today) {
-      if (activeIds.includes(NOTIFICATION_ID_AM)) {
-        await LocalNotifications.cancel({
-          notifications: [{ id: NOTIFICATION_ID_AM }],
-        });
-      }
-      notificationsToSchedule.push({
-        id: NOTIFICATION_ID_AM,
-        title: 'Yo Music',
-        body: getRandomMessage(),
-        channelId: CHANNEL_ID,
-        schedule: {
-          on: { hour: 8, minute: 0 },
-          repeats: true,
-          allowWhileIdle: true, // Android 11+ Doze Mode delay
-        },
-      });
-      notifStatus.am = today;
+    console.log('pending ids:', ids);
+
+    const isValid = saved === 'true' && ids.includes(1) && ids.includes(2);
+
+    if (isValid) {
+      console.log('notifications healthy');
+      return;
     }
+    // repair everything
+    await LocalNotifications.cancel({
+      notifications: [{ id: 1 }, { id: 2 }],
+    });
 
-    // --- 9:00 PM Notification Handling ---
-    if (notifStatus.pm !== today) {
-      if (activeIds.includes(NOTIFICATION_ID_PM)) {
-        await LocalNotifications.cancel({
-          notifications: [{ id: NOTIFICATION_ID_PM }],
-        });
-      }
-      notificationsToSchedule.push({
-        id: NOTIFICATION_ID_PM,
-        title: 'Yo Music',
-        body: getRandomMessage(),
-        channelId: CHANNEL_ID,
-        schedule: {
-          on: { hour: 20, minute: 0 }, // 8 PM
-          repeats: true,
-          allowWhileIdle: true, // Android 11+ Doze Mode delay
+    const notifications = [];
+
+    notifications.push({
+      id: NOTIFICATION_ID_AM,
+      title: 'Yo Music',
+      body: getRandomMessage(morningMessages),
+      channelId: CHANNEL_ID,
+      schedule: {
+        on: {
+          hour: 12,
+          minute: 0,
         },
-      });
-      notifStatus.pm = today;
-    }
+        repeats: true,
+        allowWhileIdle: true,
+      },
+    });
 
-    // 4. Batch Dispatch to Native OS
-    if (notificationsToSchedule.length > 0) {
+    notifications.push({
+      id: NOTIFICATION_ID_PM,
+      title: 'Yo Music',
+      body: getRandomMessage(eveningMessages),
+      channelId: CHANNEL_ID,
+      schedule: {
+        on: {
+          hour: 20,
+          minute: 0,
+        },
+        repeats: true,
+        allowWhileIdle: true,
+      },
+    });
+
+    if (notifications.length) {
       await LocalNotifications.schedule({
-        notifications: notificationsToSchedule,
+        notifications,
       });
+      localStorage.setItem('daily_notifs_set', 'true');
 
-      // Update our storage object
-      localStorage.setItem('notif_last_set_v2', JSON.stringify(notifStatus));
-      console.log(`Successfully scheduled ${notificationsToSchedule.length} notification(s).`);
+      console.log('Daily notifications scheduled');
+    } else {
+      console.log('already set notifs');
     }
-  } catch (err) {
-    console.error('Notification setup error:', err);
+  } catch (e) {
+    console.error(e);
   }
 }
 
@@ -123,87 +103,5 @@ export default function DailyNotification() {
     setupDailyNotifications();
   }, []);
 
-  return <></>;
+  return null;
 }
-
-// import { useEffect } from "react";
-// import { LocalNotifications } from "@capacitor/local-notifications";
-
-// const NOTIFICATION_ID = 1;
-
-// const messages = [
-//   "Don't forget to listen latest releases!",
-//   "Start listening to your favorite songs!",
-//   "Take a look at new releases!",
-//   "Enjoy now latest trending musics!",
-// ];
-
-// function getRandomMessage() {
-//   return messages[Math.floor(Math.random() * messages.length)];
-// }
-
-// async function setupDailyNotification() {
-//   const today = new Date().toDateString();
-//   const last = localStorage.getItem("notif_last_set");
-
-//   if (last === today) {
-//     console.log("Already scheduled today, skipping...");
-//     return;
-//   }
-
-//   try {
-//     // 1. Request permission
-//     const permission = await LocalNotifications.requestPermissions();
-
-//     if (permission.display !== "granted") {
-//       console.log("Notification permission not granted");
-//       return;
-//     }
-
-//     // 2. Get pending notifications
-//     const pending = await LocalNotifications.getPending();
-
-//     const alreadyScheduled = pending.notifications.some(
-//       (n) => n.id === NOTIFICATION_ID
-//     );
-
-//     // 3. Cancel existing (so message refreshes daily)
-//     if (alreadyScheduled) {
-//       await LocalNotifications.cancel({
-//         notifications: [{ id: NOTIFICATION_ID }],
-//       });
-//     }
-
-//     // 4. Schedule new notification
-//     await LocalNotifications.schedule({
-//       notifications: [
-//         {
-//           id: NOTIFICATION_ID,
-//           title: "Yo Music",
-//           body: getRandomMessage(),
-//           schedule: {
-//             on: {
-//               hour: 8,
-//               minute: 0,
-//             },
-//             repeats: true,
-//           },
-//         },
-//       ],
-//     });
-
-//     localStorage.setItem("notif_last_set", today);
-
-//     console.log("Daily notification scheduled");
-//   } catch (err) {
-//     console.error("Notification setup error:", err);
-//   }
-// }
-
-// export default function DailyNotification() {
-//   useEffect(() => {
-//     setupDailyNotification();
-//   }, []);
-
-//   return <></>;
-// }
