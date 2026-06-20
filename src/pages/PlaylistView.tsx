@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Yt } from '../api';
 import { Button, List } from 'konsta/react';
 import VideoCard from '../components/cards/VideoCard';
 import { LuLoaderCircle } from 'react-icons/lu';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { PlaylistType, VideoType } from '../types';
-import { MdPlayArrow, MdPlaylistPlay, MdShare } from 'react-icons/md';
+import { MdFavorite, MdFavoriteBorder, MdPlayArrow, MdPlaylistPlay, MdShare } from 'react-icons/md';
 import { useDataStore } from '../zustand/app_data_store';
 import { handleShare } from '../utils/shareText';
+import { toastMsg } from '../utils/toastMsg';
 
 const PlaylistView = () => {
   const { playlistId } = useParams();
-  const { playlistData, setplaylistData } = useDataStore();
+  const { playlistData, setplaylistData, playlists, setPlaylists } = useDataStore();
   const [loading, setloading] = useState(false);
   const [loadingNext, setloadingNext] = useState(false);
   const navigate = useNavigate();
@@ -105,6 +106,28 @@ const PlaylistView = () => {
     sessionStorage.setItem(`cachedPlaylistMap`, JSON.stringify(parsedCachedPlaylistMap));
   }
 
+  const isAlreadySavedPl = useMemo(
+    () => playlists.some((item) => item.playlistId === playlistId),
+    [playlists, playlistId]
+  );
+
+  const toggleSaveToPl = () => {
+    if (isAlreadySavedPl) {
+      setPlaylists(playlists.filter((f) => f.playlistId != playlistId));
+      toastMsg('Removed from playlists');
+    } else {
+      if (playlistData.playlistId) {
+        const formattedObj = {
+          ...playlistData,
+          isCustomChannel: false,
+          videoItems: { items: [], nextPage: '' },
+        };
+        setPlaylists([formattedObj, ...playlists]);
+        toastMsg('Saved to playlists');
+      }
+    }
+  };
+
   return (
     <div className="w-full">
       {loading ? (
@@ -152,6 +175,9 @@ const PlaylistView = () => {
                       <MdPlayArrow size={18} className="me-2" />
                       Play
                     </Button>
+                    <span onClick={toggleSaveToPl}>
+                      {isAlreadySavedPl ? <MdFavorite size={24} /> : <MdFavoriteBorder size={24} />}
+                    </span>
                     <span
                       onClick={() => {
                         handleShare({
