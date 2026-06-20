@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 const CHANNEL_ID = 'music_alerts';
-const NOTIFICATION_ID_AM = 1;
-const NOTIFICATION_ID_PM = 2;
+const NOTIFICATION_ID_AM = 111;
+const NOTIFICATION_ID_PM = 222;
 
 const morningMessages = [
   "Don't forget to listen to the latest releases!",
@@ -48,7 +48,7 @@ async function setupDailyNotifications() {
     }
     // repair everything
     await LocalNotifications.cancel({
-      notifications: [{ id: 1 }, { id: 2 }],
+      notifications: [{ id: NOTIFICATION_ID_AM }, { id: NOTIFICATION_ID_PM }],
     });
 
     const notifications = [];
@@ -60,7 +60,7 @@ async function setupDailyNotifications() {
       channelId: CHANNEL_ID,
       schedule: {
         on: {
-          hour: 12,
+          hour: 8,
           minute: 0,
         },
         repeats: true,

@@ -81,6 +81,13 @@ jobs:
           chmod +x ./android/gradlew
           npx cap build android
 
+      - name: Rename APK File
+        run: |
+          OLD_PATH="android/app/build/outputs/apk/release/app-release-signed.apk"
+          NEW_PATH="android/app/build/outputs/apk/release/YoMusic_${{ github.event.inputs.version }}.apk"
+
+          mv "$OLD_PATH" "$NEW_PATH"
+
       - name: Create Git Tag
         run: |
           git config user.name "github-actions"
@@ -96,7 +103,8 @@ jobs:
         with:
           tag_name: v${{ github.event.inputs.version }}
           name: Release v${{ github.event.inputs.version }}
-          files: android/app/build/outputs/apk/release/app-release-signed.apk
+          body_path: changeLog/CHANGELOG.md
+          files: android/app/build/outputs/apk/release/YoMusic_${{ github.event.inputs.version }}.apk
           draft: false
           prerelease: false
         env:
